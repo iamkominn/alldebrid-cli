@@ -42,7 +42,7 @@ async fn main() -> Result<()> {
     
     // Make the API request
     let response = client
-        .post("http://api.alldebrid.com/v4/link/unlock")
+        .post("https://api.alldebrid.com/v4/link/unlock")
         .header("Authorization", format!("Bearer {}", api_key))
         .multipart(form)
         .send()
