@@ -5,18 +5,22 @@ A simple command-line tool to unlock links with the AllDebrid API.
 ## Features
 
 - Unlock links via the AllDebrid API
-- Read API key securely from environment variables
 - Extract direct download links from the API response
+- Cross-platform configuration with support for:
+  - Environment variables
+  - Local .env file
+  - Platform-specific configuration directories
 
 ## Installation
 
 1. Clone this repository
-2. Copy `.env.example` to `.env` and add your AllDebrid API key
-3. Build the project:
+2. Build the project:
 
 ```bash
 cargo build --release
 ```
+
+3. Copy the binary from `target/release/alldebrid-cli` to a location in your PATH
 
 ## Usage
 
@@ -30,14 +34,20 @@ To include an optional password:
 alldebrid-cli "http://example.com/somefile" "your_password"
 ```
 
-## Environment Variables
+## Configuration
 
-Create a `.env` file in the project root with the following:
+The application looks for your AllDebrid API key in the following locations (in order of priority):
 
-```
-ALLDEBRID_API_KEY=your_api_key_here
-```
+1. Environment variable: `ALLDEBRID_API_KEY`
+2. `.env` file in the current directory
+3. Platform-specific configuration file:
+   - **Linux**: `~/.config/alldebrid-cli/alldebrid-cli.conf`
+   - **macOS**: `~/Library/Application Support/alldebrid-cli/alldebrid-cli.conf`
+   - **Windows**: `C:\Users\Username\AppData\Roaming\alldebrid-cli\alldebrid-cli.conf`
 
-## License
+### Creating a Configuration File
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+```bash
+# Linux
+mkdir -p ~/.config/alldebrid-cli/
+echo "ALLDEBRID_
