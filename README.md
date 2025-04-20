@@ -50,4 +50,56 @@ The application looks for your AllDebrid API key in the following locations (in 
 ```bash
 # Linux
 mkdir -p ~/.config/alldebrid-cli/
-echo "ALLDEBRID_
+echo "ALLDEBRID_API_KEY=your_api_key_here" > ~/.config/alldebrid-cli/alldebrid-cli.conf
+chmod 600 ~/.config/alldebrid-cli/alldebrid-cli.conf
+
+# macOS
+mkdir -p ~/Library/Application\ Support/alldebrid-cli/
+echo "ALLDEBRID_API_KEY=your_api_key_here" > ~/Library/Application\ Support/alldebrid-cli/alldebrid-cli.conf
+chmod 600 ~/Library/Application\ Support/alldebrid-cli/alldebrid-cli.conf
+
+# Windows (PowerShell)
+New-Item -Path "$env:APPDATA\alldebrid-cli" -ItemType Directory -Force
+Set-Content -Path "$env:APPDATA\alldebrid-cli\alldebrid-cli.conf" -Value "ALLDEBRID_API_KEY=your_api_key_here"
+```
+
+### Using Environment Variables
+
+```bash
+# Linux/macOS
+export ALLDEBRID_API_KEY=your_api_key_here
+alldebrid-cli "http://example.com/somefile"
+
+# Windows
+set ALLDEBRID_API_KEY=your_api_key_here
+alldebrid-cli "http://example.com/somefile"
+```
+
+### Using .env File
+
+Create a `.env` file in the same directory as the binary with the following content:
+
+```
+ALLDEBRID_API_KEY=your_api_key_here
+```
+
+## Building from Source
+
+Requirements:
+- Rust toolchain (rustc, cargo)
+- Internet connection for downloading dependencies
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/alldebrid-cli.git
+cd alldebrid-cli
+
+# Build in release mode
+cargo build --release
+
+# The binary will be in target/release/alldebrid-cli
+```
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
