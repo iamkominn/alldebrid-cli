@@ -3,15 +3,68 @@ use dotenv::dotenv;
 use reqwest::multipart::{Form, Part};
 use serde_json::Value;
 use std::env;
+use std::fs;
+use std::path::{Path, PathBuf};
+use std::io::Read;
+
+/// Get the config directory path based on the platform
+fn get_config_dir() -> PathBuf {
+    if let Some(config_dir) = dirs::config_dir() {
+        // Standard config directories:
+        // - Linux/macOS: ~/.config/alldebrid-cli/
+        // - Windows: C:\Users\Username\AppData\Roaming\alldebrid-cli\
+        config_dir.join("alldebrid-cli")
+    } else {
+        // Fallback to current directory
+        PathBuf::from(".")
+    }
+}
+
+/// Get the API key from the config file or environment variable
+fn get_api_key() -> Result<String> {
+    // First try to get from environment variable
+    if let Ok(key) = env::var("ALLDEBRID_API_KEY") {
+        return Ok(key);
+    }
+    
+    // Try .env file in current directory as fallback
+    dotenv().ok();
+    if let Ok(key) = env::var("ALLDEBRID_API_KEY") {
+        return Ok(key);
+    }
+    
+    // If not found in environment, try to get from config file
+    let config_path = get_config_dir().join("alldebrid-cli.conf");
+    
+    if config_path.exists() {
+        let mut file = fs::File::open(&config_path)
+            .context(format!("Failed to open config file at {:?}", config_path))?;
+            
+        let mut contents = String::new();
+        file.read_to_string(&mut contents)
+            .context("Failed to read config file")?;
+            
+        // Parse the config file (simple key=value format)
+        for line in contents.lines() {
+            let line = line.trim();
+            if line.starts_with("ALLDEBRID_API_KEY=") {
+                let key = line.strip_prefix("ALLDEBRID_API_KEY=").unwrap_or("").trim();
+                if !key.is_empty() {
+                    return Ok(key.to_string());
+                }
+            }
+        }
+    }
+    
+    // If all else fails, return an error
+    Err(anyhow::anyhow!("API key not found. Please set ALLDEBRID_API_KEY in your environment, \
+                         in a .env file, or in the config file at {:?}", config_path))
+}
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    // Load environment variables from .env file
-    dotenv().ok();
-    
-    // Get API key from environment
-    let api_key = env::var("ALLDEBRID_API_KEY")
-        .context("Failed to get ALLDEBRID_API_KEY from environment. Please set it in .env file")?;
+    // Get API key from config or environment
+    let api_key = get_api_key()?;
     
     // Get link from command line arguments
     let args: Vec<String> = env::args().collect();
@@ -42,7 +95,7 @@ async fn main() -> Result<()> {
     
     // Make the API request
     let response = client
-        .post("https://api.alldebrid.com/v4/link/unlock")
+        .post("http://api.alldebrid.com/v4/link/unlock")
         .header("Authorization", format!("Bearer {}", api_key))
         .multipart(form)
         .send()
