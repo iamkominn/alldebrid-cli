@@ -4,14 +4,15 @@ use reqwest::multipart::{Form, Part};
 use serde_json::Value;
 use std::env;
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::io::Read;
 
 /// Get the config directory path based on the platform
 fn get_config_dir() -> PathBuf {
     if let Some(config_dir) = dirs::config_dir() {
         // Standard config directories:
-        // - Linux/macOS: ~/.config/alldebrid-cli/
+        // - Linux: ~/.config/alldebrid-cli/
+        // - Mac: ~/Library/Application Support/alldebrid-cli/
         // - Windows: C:\Users\Username\AppData\Roaming\alldebrid-cli\
         config_dir.join("alldebrid-cli")
     } else {
@@ -95,7 +96,7 @@ async fn main() -> Result<()> {
     
     // Make the API request
     let response = client
-        .post("http://api.alldebrid.com/v4/link/unlock")
+        .post("https://api.alldebrid.com/v4/link/unlock")
         .header("Authorization", format!("Bearer {}", api_key))
         .multipart(form)
         .send()
