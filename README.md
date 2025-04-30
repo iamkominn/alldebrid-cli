@@ -6,6 +6,7 @@ A simple command-line tool to unlock links with the AllDebrid API.
 
 - Unlock links via the AllDebrid API
 - Extract direct download links from the API response
+- Process multiple URLs from a file
 - Cross-platform configuration with support for:
   - Environment variables
   - Local .env file
@@ -24,6 +25,8 @@ cargo build --release
 
 ## Usage
 
+### Process a single URL
+
 ```bash
 alldebrid-cli "http://example.com/somefile"
 ```
@@ -32,6 +35,28 @@ To include an optional password:
 
 ```bash
 alldebrid-cli "http://example.com/somefile" "your_password"
+```
+
+### Process multiple URLs from a file
+
+Create a text file with one URL per line, then:
+
+```bash
+alldebrid-cli -i urls.txt
+```
+
+With an optional password:
+
+```bash
+alldebrid-cli -i urls.txt "your_password"
+```
+
+The file can include comments (lines starting with #) and empty lines, which will be skipped.
+
+### Help
+
+```bash
+alldebrid-cli --help
 ```
 
 ## Configuration
@@ -81,6 +106,24 @@ Create a `.env` file in the same directory as the binary with the following cont
 
 ```
 ALLDEBRID_API_KEY=your_api_key_here
+```
+
+## Cross-Compiling for Raspberry Pi
+
+To build for Raspberry Pi, you can use the `cross` tool:
+
+```bash
+# Install cross
+cargo install cross
+
+# For Raspberry Pi 3/4 with 64-bit OS
+cross build --target aarch64-unknown-linux-gnu --release
+
+# For Raspberry Pi 2/3/4 with 32-bit OS
+cross build --target armv7-unknown-linux-gnueabihf --release
+
+# For Raspberry Pi 1/Zero
+cross build --target arm-unknown-linux-gnueabihf --release
 ```
 
 ## Building from Source
